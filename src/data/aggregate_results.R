@@ -4,13 +4,8 @@
 # Created on: 2019. 10. 29.
 library('RankAggreg')
 set.seed(100)
-aggreg_mlt <- function(m, n) {
-  mm <- as.matrix(m)
-  t <- RankAggreg(mm, n, method="CE", distance="Spearman",
-                  N=106, convIn=5, rho=.1, verbose=FALSE)
-  return(t[1])
-}
 
-t <- read.csv(file="/home/developer/PycharmProjects/countries/data/interim/ranks.csv", header = False)
-
-res <- aggreg_mlt(t, 106)
+t <- read.table(file="/home/developer/PycharmProjects/countries/data/interim/ranks.csv", header = FALSE, sep=",")
+t <- as.matrix(t)
+p <- RankAggreg(t, 106, method="CE", distance="Spearman",
+                N=150, convIn=5, rho=.1, verbose=TRUE)
