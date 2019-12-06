@@ -66,6 +66,16 @@ geo_names = list(geo_df["CountryName"])
 geo_codes = [convert_country(n) for n in geo_names]
 geo_df["ISO3"] = geo_codes
 
+hdi_df = pd.read_csv("data/raw/Human Development Index (HDI).csv",
+                     encoding="utf-8",
+                     sep=",",
+                     na_values=["n.a", "NaN"])
+hdi_df = hdi_df.dropna()
+hdi_names = list(hdi_df["Country"])
+hdi_codes = [convert_country(n) for n in hdi_names]
+hdi_df["ISO3"] = hdi_codes
+
+
 super_df = pd.merge(happiness_df, competitiveness_df, left_on="ISO3", right_on="ISO3")
 super_df = pd.merge(super_df, freedom_df, left_on="ISO3", right_on="ISO3")
 super_df = pd.merge(super_df, gdp_df, left_on="ISO3", right_on="ISO3")
@@ -73,6 +83,7 @@ super_df = pd.merge(super_df, business_df, left_on="ISO3", right_on="ISO3")
 super_df = pd.merge(super_df, law_df, left_on="ISO3", right_on="ISO3")
 super_df = pd.merge(super_df, science_df, left_on="ISO3", right_on="ISO3")
 super_df = pd.merge(super_df, geo_df, left_on="ISO3", right_on="ISO3")
+super_df = pd.merge(super_df, hdi_df, left_on="ISO3", right_on="ISO3")
 
 super_df["Freedom Rank"] = super_df["Aggregate Score"].rank(method="max")
 t = super_df.to_csv(index=False)

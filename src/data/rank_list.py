@@ -3,34 +3,42 @@ import json
 import pandas as pd
 
 df = pd.read_csv("data/interim/super_dataframe.csv", sep=",", encoding="utf-8")
-competitiveness = ["None"] * 106
-gdp = ["None"] * 106
-business = ["None"] * 106
-law = ["None"] * 106
-science = ["None"] * 106
-happiness = ["None"] * 106
-freedom = ["None"] * 106
+df["LawRank"] = [int(e.replace("/126", "")) for e in df["LawRank"]]
+df = df.drop_duplicates("Country_x", keep="first")
+countries = sorted(list((df["Country_x"])))
 
-countries = list(df["Country_x"])
 
-for index, row in df.iterrows():
-    country = countries[index]
-    competitiveness_rank = row["Competitiveness Rank"] - 1
-    competitiveness[competitiveness_rank] = country
-    gdp_rank = row["GDP Rank"] - 1
-    gdp[gdp_rank] = country
-    business_rank = row["Business Rank"] - 1
-    business[business_rank] = country
-    law_rank = row["Law Rank"] - 1
-    law[law_rank] = country
-    science_rank = row["Science Rank"] - 1
-    science[science_rank] = country
-    happiness_rank = row["Happiness Rank"] - 1
-    happiness[happiness_rank] = country
-    freedom_rank = row["Freedom Rank"] - 1
-    freedom[freedom_rank] = country
+def get_country_rank(country, ranking):
+    return ranking.index(country) + 1
 
-m = [competitiveness, gdp, business, law, science, happiness, freedom]
+
+competitiveness = list(df.sort_values(by=["Competetiveness Rank / 141"])["Country_x"])
+competitiveness_ranks = [get_country_rank(country, competitiveness) for country in countries]
+
+gdp = list(df.sort_values(by=["GDP Rank"])["Country_x"])
+gdp_ranks = [get_country_rank(country, gdp) for country in countries]
+
+business = list(df.sort_values(by=["Business Rank"])["Country_x"])
+business_ranks = [get_country_rank(country, business) for country in countries]
+
+law = list(df.sort_values(by=["LawRank"])["Country_x"])
+law_ranks = [get_country_rank(country, law) for country in countries]
+
+science = list(df.sort_values(by=["ScienceRank"])["Country_x"])
+science_ranks = [get_country_rank(country, science) for country in countries]
+
+happiness = list(df.sort_values(by=["Happiness score"])["Country_x"])
+happiness.reverse()
+happiness_ranks = [get_country_rank(country, happiness) for country in countries]
+
+freedom = list(df.sort_values(by=["Freedom Rank"])["Country_x"])
+freedom.reverse()
+freedom_ranks = [get_country_rank(country, freedom) for country in countries]
+
+hdi = list(df.sort_values(by=["HDI Rank (2017)"])["Country_x"])
+hdi_ranks = [get_country_rank(country, hdi) for country in countries]
+
+m = [competitiveness, gdp, business, law, science, happiness, freedom, hdi]
 mdf = pd.DataFrame(m)
 towrite = mdf.to_csv(index=False, header=False)
 with open("data/interim/ranks.csv", "w") as f:
@@ -39,44 +47,56 @@ with open("data/interim/ranks.csv", "w") as f:
 with open("data/interim/ranaggreg.txt", "r") as inf:
     aggregated = inf.read().strip().split(",")
 
-aggregated_ranks = [aggregated.index(e)+1 for e in countries]
-df["Aggregated Rank"] = aggregated_ranks
-finalcsv = df.to_csv(index=False)
-with open("data/processed/fullranking.csv", "w") as outfile:
-    outfile.write(finalcsv)
-
-# json
-# var myData = [
-# 	{
-# 		key: "UK",
-# 		values: [
-# 			{ key: "Apples", value: 9 },
-# 			{ key: "Oranges", value: 3 },
-# 			{ key: "Pears", value: 5 },
-# 			{ key: "Bananas", value: 7 }
-# 		]
-# 	},
-# 	{
-# 		key: "France",
-# 		values: [
-# 			{ key: "Apples", value: 5 },
-# 			{ key: "Oranges", value: 4 },
-# 			{ key: "Pears", value: 6 },
-# 			{ key: "Bananas", value: 2 }
-# 		]
-# 	}
-# ];
+aggregated_ranks = [get_country_rank(country, aggregated) for country in countries]
+all_ranks = [competitiveness_ranks, gdp_ranks, business_ranks, law_ranks,
+             science_ranks, happiness_ranks, freedom_ranks, hdi_ranks,
+             aggregated_ranks]
+avg = [float(sum(col))/len(col) for col in zip(*all_ranks)]
+all_ranks.append(avg)
+all_ranks.insert(0, countries)
+all_df = pd.DataFrame(all_ranks)
+header = ["Country", "Competitiveness", "GDP", "Business", "Law", "Science",
+          "Happiness", "Freedom", "HDI", "Aggregated", "Average"]
+all_write = all_df.T.to_csv(index=False, header=header)
+with open("data/processed/final.csv", "w") as f:
+    f.write(all_write)
+#
+# # json
+# # var myData = [
+# # 	{
+# # 		key: "UK",
+# # 		values: [
+# # 			{ key: "Apples", value: 9 },
+# # 			{ key: "Oranges", value: 3 },
+# # 			{ key: "Pears", value: 5 },
+# # 			{ key: "Bananas", value: 7 }
+# # 		]
+# # 	},
+# # 	{
+# # 		key: "France",
+# # 		values: [
+# # 			{ key: "Apples", value: 5 },
+# # 			{ key: "Oranges", value: 4 },
+# # 			{ key: "Pears", value: 6 },
+# # 			{ key: "Bananas", value: 2 }
+# # 		]
+# # 	}
+# # ];
 mydata = []
-data = eval(df.to_json(orient='records'))
+jsdata = all_df.T
+data = eval(jsdata.to_json(orient='records'))
 for e in data:
     values = []
-    ks = ["Happiness Rank", "Freedom Rank", "Competitiveness Rank",
-          "GDP Rank", "Business Rank", "Law Rank", "Science Rank",
-          "Aggregated Rank"]
+    evalues = list(e.values())[1:]
+    country = list(e.values())[0]
+    ks = ["Competitiveness", "GDP", "Business", "Law", "Science",
+          "Happiness", "Freedom", "HDI", "Aggregated", "Average"]
+
     for k in ks:
-        kv = {"key": k, "value": abs(e[k]-106)+1}
+        i = ks.index(k)
+        kv = {"key": k, "value": abs(evalues[i]-106)+1}
         values.append(kv)
-    elem = {"key": e["Country_x"],
+    elem = {"key": country,
             "values": values}
     mydata.append(elem)
 
