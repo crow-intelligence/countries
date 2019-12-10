@@ -4,6 +4,14 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
 import plotly.offline as py
+import country_converter as coco
+
+cc = coco.CountryConverter()
+
+
+def convert_country(country):
+    return cc.convert(names=[country], to="ISO3")
+
 
 with open("projData.pkl", "rb") as f:
     projdata = pickle._load(f)
@@ -25,7 +33,9 @@ with open("qthresh_clusters.dat", "r") as f:
         i += 1
 
 clusters = [country_cluster[country] for country in labels]
+country_codes_iso3 = [convert_country(country) for country in labels]
 df["Clusters"] = clusters
+df["ISO3"] = country_codes_iso3
 
 all_write = df.to_csv(index=False)
 with open("data/processed/final_with_clusters.csv", "w") as f:
@@ -45,10 +55,10 @@ avg = list(df["Average"])
 aggregated = list(df["Aggregated"])
 
 header_labels = list(df.columns)
-h = ["Country", "Competitiveness", "GDP", "Business", "Law", "Science",
+h = ["Country", "ISO3", "Competitiveness", "GDP", "Business", "Law", "Science",
      "Happiness", "Freedom", "HDI", "Average", "Aggregated", "Cluster"]
-ranks = list(zip(labels, comp, gdp, business, law, science, happiness,
-                 freedom, hdi, avg, aggregated, clusters))
+ranks = list(zip(labels, country_codes_iso3, comp, gdp, business, law, science,
+                 happiness, freedom, hdi, avg, aggregated, clusters))
 
 legends = []
 for i in range(len(ranks)):
@@ -83,27 +93,27 @@ data = [trace0]
 layout = go.Layout(
     images= [dict(
                   source= "cropped.png",
-                  xref="x",
-                  yref="y",
-                  x=-0.5,
-                  y=20.2*2/np.sqrt(3)*3/4,
-                  sizex= 43.5,
-                  sizey= 22*2/np.sqrt(3)*3/4,
-                  sizing="stretch",
-                  opacity=0.8,
-                  layer="below")],
+                  xref= "x",
+                  yref= "y",
+                  x= -0.5,
+                  y= 39.5*2/np.sqrt(3)*3/4,
+                  sizex= 40.5,
+                  sizey= 40*2/np.sqrt(3)*3/4,
+                  sizing= "stretch",
+                  opacity= 0.8,
+                  layer= "below")],
     width = 800,
     height = 800,
     hovermode= 'closest',
     xaxis= dict(
-        range=[-1,21],
+        range=[-1,41],
         zeroline=False,
         showgrid=False,
         ticks='',
         showticklabels=False
     ),
     yaxis=dict(
-        range=[-1,21],
+        range=[-1,41],
         zeroline=False,
         showgrid=False,
         ticks='',

@@ -9,7 +9,7 @@ df = pd.read_csv("data/processed/final.csv",
 labels = df["Country"]
 df = df.drop(["Country", "Aggregated", "Average"], axis=1)
 
-net = sps.somNet(20, 20, df.values, PBC=True, PCI=True)
+net = sps.somNet(40, 40, df.values, PBC=True, PCI=True)
 #net = sps.somNet(40, 40, df.values, PBC=True, PCI=True, loadFile="somweights")
 net.train(0.1, 10000)
 net.save('somweights')
