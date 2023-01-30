@@ -1,39 +1,27 @@
-import pickle
-
 import pandas as pd
-import SimpSOM as sps
-from PIL import Image, ImageChops
+import simpsom as sps
 
 df = pd.read_csv("data/processed/final.csv", sep=",")
 labels = df["Country"]
 df = df.drop(["Country", "Aggregated", "Average"], axis=1)
 
-net = sps.somNet(40, 40, df.values, PBC=True, PCI=True)
-# net = sps.somNet(40, 40, df.values, PBC=True, PCI=True, loadFile="somweights")
-net.train(0.1, 10000)
-net.save("somweights")
-# net.nodes_graph(colnum=6)
-# net.diff_graph()
+net = sps.SOMNet(
+    50,
+    50,
+    df.values,
+    topology="hexagonal",
+    init="PCA",
+    metric="cosine",
+    neighborhood_fun="gaussian",
+    PBC=True,
+    random_seed=32,
+    GPU=False,
+    CUML=False,
+    output_path="models",
+)
+net.train(train_algo="batch", start_learning_rate=0.01, epochs=-1, batch_size=-1)
 
-net.cluster(df.values, type="qthresh")
-net.diff_graph(show=True, printout=True)
+net.save_map("trained_som.npy")
 
-
-# Here we first define a few useful functions
-def autocrop(fileName):
-    im = Image.open(fileName)
-    im = im.crop((0, 100, 2900, im.size[1]))
-    bg = Image.new(im.mode, im.size, im.getpixel((0, 0)))
-    diff = ImageChops.difference(im, bg)
-    diff = ImageChops.add(diff, diff, 2.0, -100)
-    bbox = diff.getbbox()
-    if bbox:
-        return im.crop(bbox)
-
-
-projData = net.project(df.values)
-cropped = autocrop("nodesDifference.png")
-cropped.save("cropped.png")
-
-with open("projData.pkl", "wb") as f:
-    pickle.dump(projData, f)
+projection = net.project_onto_map(df)
+# cls = net.cluster(net) # TODO: fixme!!!!!!

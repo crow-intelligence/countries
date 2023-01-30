@@ -3,8 +3,9 @@ import pickle
 import country_converter as coco
 import numpy as np
 import pandas as pd
-import plotly.graph_objs as go
-import plotly.offline as py
+
+# import plotly.graph_objs as go
+# import plotly.offline as py
 
 cc = coco.CountryConverter()
 
@@ -138,4 +139,4 @@ layout = go.Layout(
 )
 
 fig = dict(data=data, layout=layout)
-py.plot(fig, filename="styled-scatter.html")
+# py.plot(fig, filename="styled-scatter.html")

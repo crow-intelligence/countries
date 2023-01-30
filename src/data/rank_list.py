@@ -82,36 +82,3 @@ all_write = all_df.T.to_csv(index=False, header=header)
 with open("data/processed/final.csv", "w") as f:
     f.write(all_write)
 
-for country in countries:
-    i = countries.index(country)
-
-# mydata = []
-# jsdata = all_df.T
-# data = eval(jsdata.to_json(orient="records"))
-# for e in data:
-#     values = []
-#     evalues = list(e.values())[1:]
-#     country = list(e.values())[0]
-#     ks = [
-#         "Competitiveness",
-#         "GDP",
-#         "Business",
-#         "Law",
-#         "Science",
-#         "Happiness",
-#         "Freedom",
-#         "HDI",
-#         "Aggregated",
-#         "Average",
-#     ]
-#
-#     for k in ks:
-#         i = ks.index(k)
-#         kv = {"key": k, "value": abs(evalues[i] - 106) + 1}
-#         values.append(kv)
-#     elem = {"key": country, "values": values}
-#     mydata.append(elem)
-#
-#
-# with open("data/processed/ranking.json", "w") as outfile:
-#     json.dump(mydata, outfile)

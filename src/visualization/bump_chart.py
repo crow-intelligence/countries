@@ -1,6 +1,8 @@
 import altair as alt
 import pandas as pd
 
+alt.themes.enable("fivethirtyeight")
+
 df = pd.read_csv("data/processed/final.csv", sep=",")
 
 rankings = [
@@ -30,10 +32,11 @@ for ranking in rankings:
         alt.Chart(df_top)
         .mark_line(point=True)
         .encode(
-            x=alt.X("variable:O", title="ranking"),
-            y="rank:O",
+            x=alt.X("variable:N", title="ranking"),
+            y=alt.Y("rank:Q", scale=alt.Scale(zero=False)),
             color=alt.Color("Country:N"),
             tooltip="Country",
+            strokeWidth=alt.value(40),
         )
         .transform_window(
             rank="rank()",

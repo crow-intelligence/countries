@@ -9,6 +9,9 @@ pandas = "*"
 isort = {extras = ["pipfile_deprecated_finder"], version = "*"}
 openpyxl = "*"
 altair = "*"
+simpsom = {editable = true, git = "https://github.com/fcomitani/simpsom"}
+folium = "*"
+hdbscan = "*"
 
 [dev-packages]
 black = "*"
