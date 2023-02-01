@@ -12,6 +12,8 @@ altair = "*"
 simpsom = {editable = true, git = "https://github.com/fcomitani/simpsom"}
 folium = "*"
 hdbscan = "*"
+geopandas = "*"
+gpdvega = "*"
 
 [dev-packages]
 black = "*"

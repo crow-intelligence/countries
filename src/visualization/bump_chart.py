@@ -6,20 +6,20 @@ alt.themes.enable("fivethirtyeight")
 df = pd.read_csv("data/processed/final.csv", sep=",")
 
 rankings = [
-    "Competitiveness",
+    # "Competitiveness",
     "GDP",
     "Business",
     "Law",
     "Science",
     "Happiness",
-    "HDI",
-    "Aggregated",
-    "Average",
+    # "HDI",
+    # "Aggregated",
+    # "Average",
 ]
 
 for ranking in rankings:
     df_sorted = df.sort_values(by=ranking, ascending=True)
-    top10 = df_sorted["Country"][:10]
+    top10 = df_sorted["Country"][:5]
     df_top = df_sorted[df_sorted["Country"].isin(top10)]
 
     df_top = pd.melt(
@@ -33,7 +33,7 @@ for ranking in rankings:
         .mark_line(point=True)
         .encode(
             x=alt.X("variable:N", title="ranking"),
-            y=alt.Y("rank:Q", scale=alt.Scale(zero=False)),
+            y=alt.Y("rank:O", scale=alt.Scale(zero=False)),
             color=alt.Color("Country:N"),
             tooltip="Country",
             strokeWidth=alt.value(40),
@@ -50,4 +50,4 @@ for ranking in rankings:
         )
     ).interactive()
 
-    chart.save(f"vizs/{ranking}.html")
+    chart.save(f"vizs/bumps/{ranking}.html")

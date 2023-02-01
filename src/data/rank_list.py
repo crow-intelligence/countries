@@ -81,4 +81,3 @@ header = [
 all_write = all_df.T.to_csv(index=False, header=header)
 with open("data/processed/final.csv", "w") as f:
     f.write(all_write)
-
