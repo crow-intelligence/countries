@@ -14,6 +14,7 @@ folium = "*"
 hdbscan = "*"
 geopandas = "*"
 gpdvega = "*"
+jsonmerge = "*"
 
 [dev-packages]
 black = "*"

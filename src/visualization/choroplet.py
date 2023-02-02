@@ -46,6 +46,7 @@ rankings = [
 gpdf = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
 
 ranking_df = pd.merge(gpdf, df, on=["iso_a3"], how="outer")
+ranking_df[rankings] = ranking_df[rankings].fillna(-1)
 
 for ranking in rankings:
     chart = (
@@ -59,4 +60,4 @@ for ranking in rankings:
         .properties(width=1200, height=600)
     )
 
-    chart.save(f"vizs/maps/{ranking}.html")
+    chart.save(f"vizs/maps/altair/{ranking}.html")
