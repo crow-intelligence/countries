@@ -31,6 +31,7 @@ df["AverageIDX"] = [list(df["Average"]).index(e) + 1 for e in list(df["Average"]
 
 gpdf = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
 
+# NOTE: we have to put the data into the geodata, otherwise tooltips are too tricky
 ranking_df = pd.merge(gpdf, df, on=["iso_a3"], how="outer")
 ranking_df[rankings] = ranking_df[rankings].fillna(-1)
 ranking_df[["geometry"]] = ranking_df[["geometry"]].fillna(Polygon([(0, 0), (0, 0), (0, 0)]))
