@@ -1,10 +1,11 @@
 import altair as alt
 import pandas as pd
 
-alt.themes.enable("fivethirtyeight")
+alt.themes.enable("fivethirtyeight") # itt a stílust tudod állítani
 
 df = pd.read_csv("data/processed/final.csv", sep=",")
 
+# ha valami nem kell, akkor csak kommenteld ki
 rankings = [
     # "Competitiveness",
     "GDP",
@@ -19,7 +20,7 @@ rankings = [
 
 for ranking in rankings:
     df_sorted = df.sort_values(by=ranking, ascending=True)
-    top10 = df_sorted["Country"][:5]
+    top10 = df_sorted["Country"][:5] # itt adod meg hogy hány ország legyen a ploton
     df_top = df_sorted[df_sorted["Country"].isin(top10)]
 
     df_top = pd.melt(
