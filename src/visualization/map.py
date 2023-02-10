@@ -1,9 +1,10 @@
 import json
-from shapely.geometry import Polygon
+
 import country_converter as coco
 import folium
 import geopandas as gpd
 import pandas as pd
+from shapely.geometry import Polygon
 
 cc = coco.CountryConverter()
 
@@ -34,7 +35,9 @@ gpdf = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
 # NOTE: we have to put the data into the geodata, otherwise tooltips are too tricky
 ranking_df = pd.merge(gpdf, df, on=["iso_a3"], how="outer")
 ranking_df[rankings] = ranking_df[rankings].fillna(-1)
-ranking_df[["geometry"]] = ranking_df[["geometry"]].fillna(Polygon([(0, 0), (0, 0), (0, 0)]))
+ranking_df[["geometry"]] = ranking_df[["geometry"]].fillna(
+    Polygon([(0, 0), (0, 0), (0, 0)])
+)
 geojson = json.loads(ranking_df.to_json())
 
 for ranking in rankings:
@@ -45,9 +48,11 @@ for ranking in rankings:
         geo_data=geojson,
         data=df,
         columns=rankings,
-        key_on=f"feature.properties.{ranking}"
+        key_on=f"feature.properties.{ranking}",
     ).add_to(m)
 
     folium.LayerControl().add_to(m)
-    cp.geojson.add_child(folium.features.GeoJsonTooltip(["Country"] + rankings, labels=True))
+    cp.geojson.add_child(
+        folium.features.GeoJsonTooltip(["Country"] + rankings, labels=True)
+    )
     m.save(f"vizs/maps/folium/{ranking}.html")

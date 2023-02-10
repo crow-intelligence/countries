@@ -54,7 +54,7 @@ for ranking in rankings:
         .mark_geoshape()
         .project()
         .encode(
-            color=alt.Color(f"{ranking}:Q", scale=alt.Scale(scheme='dark2')),
+            color=alt.Color(f"{ranking}:Q", scale=alt.Scale(scheme="dark2")),
             tooltip=rankings_types,
         )
         .properties(width=1200, height=600)
